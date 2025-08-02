@@ -1,6 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using HelloWorld;
-using System.Net.Http.Headers;
 
 Console.WriteLine("Please input the number:");
 Console.WriteLine("01: Random Array");
