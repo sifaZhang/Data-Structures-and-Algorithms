@@ -1,30 +1,30 @@
 ﻿
-    public class BinarySearch
-    {
+    public class LinerSearch
+{
         public static void Run()
         {
             Console.WriteLine("----------------03 start----------------");
 
             Console.WriteLine("Please input the size of the array:");
-            string strSize = Console.ReadLine();
+        string strSize = Console.ReadLine() ?? string.Empty;
             int size = int.Parse(strSize);
             Console.WriteLine("Please input the maximum value for the random numbers:");
-            string strMaxValue = Console.ReadLine();
+            string strMaxValue = Console.ReadLine() ?? string.Empty;
             int maxValue = int.Parse(strMaxValue);
 
             int[] numbers = CreateRandomArray(size, maxValue);
             Console.WriteLine("Generated array:");
             for(int number = 0; number < numbers.Length; number++)
-        {
+            {
                 Console.WriteLine("array[{0}]={1}", number, numbers[number]);
             }
 
             Console.WriteLine("Which number do you want to find:");
-            string strTarget = Console.ReadLine();
-            int target = int.Parse(strTarget);
+            string strTarget = Console.ReadLine() ?? string.Empty;
+        int target = int.Parse(strTarget);
 
             int index;
-            if (LinerSearch(numbers, target, out index))
+            if (BinarySearch(numbers, target, out index))
             {
                 Console.WriteLine($"Number {target} found at index {index}.");
             }
@@ -49,7 +49,7 @@
             return array;
         }
 
-        public static bool LinerSearch(int[] array, int target, out int index)
+        public static bool BinarySearch(int[] array, int target, out int index)
         {
             index = -1; // Default to -1 if not found
             for (int i = 0; i < array.Length; i++)

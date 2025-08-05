@@ -1,6 +1,6 @@
 ﻿namespace HelloWorld
 {
-    internal class practice02_FindPeakInArray
+    internal class FindPeakInArray
     {
         public static void Run()
         {

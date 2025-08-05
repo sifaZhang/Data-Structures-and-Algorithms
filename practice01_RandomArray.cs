@@ -1,5 +1,5 @@
 
-public class practice01
+public class RandomArray
 {
   public static void Run()
   {
