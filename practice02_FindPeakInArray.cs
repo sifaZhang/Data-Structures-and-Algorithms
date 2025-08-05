@@ -4,6 +4,8 @@
     {
         public static void Run()
         {
+            Console.WriteLine("----------------02 start----------------");
+
             uint count = 20;
             int[] numbers = new int[count];
 
@@ -36,6 +38,8 @@
                 Console.WriteLine($"The max number: {iMax}");
                 Console.WriteLine($"The min number:{iMin}");
             }
+
+            Console.WriteLine("----------------02 end----------------");
         }
     }
 }
