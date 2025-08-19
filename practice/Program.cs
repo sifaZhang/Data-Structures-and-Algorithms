@@ -10,6 +10,7 @@ Console.WriteLine("05: FlexiArray");
 Console.WriteLine("06: RecursiveLinerSearch");
 Console.WriteLine("07: RecursiveBinarySearch");
 Console.WriteLine("08: SelectionSort");
+Console.WriteLine("09: Factorial");
 
 string choice = Console.ReadLine() ?? string.Empty;
 
@@ -38,6 +39,9 @@ switch (choice)
         break;
     case "08":
         SelectionSort.Run();
+        break;
+    case "09":
+        Factorial.Run();
         break;
     default:
         Console.WriteLine("Invalid input!");
