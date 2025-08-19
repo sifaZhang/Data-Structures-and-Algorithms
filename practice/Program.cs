@@ -11,6 +11,7 @@ Console.WriteLine("06: RecursiveLinerSearch");
 Console.WriteLine("07: RecursiveBinarySearch");
 Console.WriteLine("08: SelectionSort");
 Console.WriteLine("09: Factorial");
+Console.WriteLine("10: LinkList");
 
 string choice = Console.ReadLine() ?? string.Empty;
 
@@ -42,6 +43,9 @@ switch (choice)
         break;
     case "09":
         Factorial.Run();
+        break;
+    case "10":
+        TestLinkedList.Run();
         break;
     default:
         Console.WriteLine("Invalid input!");
