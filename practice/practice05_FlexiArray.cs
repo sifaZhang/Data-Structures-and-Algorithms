@@ -28,6 +28,79 @@ namespace HelloWorld
             }
         }
 
+        //LinerSearch
+        public int LinerSearch(int target)
+        {
+            for (int i = 0; i <= iLastPos; i++)
+            {
+                if (array[i] == target)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        public int BinarySearch(int iTarget)
+        {
+            for (int iLow = 0, iHigh = iLastPos; iLow <= iHigh;)
+            {
+                int iMid = iLow + (iHigh - iLow) / 2;
+                if (array[iMid] == iTarget)
+                {
+                    return iMid;
+                }
+                else if (array[iMid] > iTarget)
+                {
+                    iHigh = iMid - 1;
+                }
+                else
+                {
+                    iLow = iMid + 1;
+                }
+            }
+
+            return -1;
+        }
+
+        public void Remove(int iValue)
+        {
+            int iIndex = BinarySearch(iValue);
+            if (iIndex > 0)
+            {
+                for(int i = iIndex; i <= iLastPos - 1; i++)
+                {
+                    array[i] = array[i + 1];
+                }
+
+                iLastPos -= 1;
+            }
+        }
+
+        // Selection Sort
+        public void Sort()
+        {
+            for (int i = 0; i <= iLastPos; i++)
+            {
+                int minIndex = i;
+                for (int j = i + 1; j <= iLastPos; j++)
+                {
+                    if (array[j] < array[minIndex])
+                    {
+                        minIndex = j;
+                    }
+                }
+
+                if (minIndex != i)
+                {
+                    // Swap the found minimum element with the first element
+                    int temp = array[i];
+                    array[i] = array[minIndex];
+                    array[minIndex] = temp;
+                }
+            }
+        }
+
         public void ShowContent()
         {
             if (iLastPos == -1)
