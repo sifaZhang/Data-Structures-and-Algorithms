@@ -12,6 +12,8 @@ Console.WriteLine("07: RecursiveBinarySearch");
 Console.WriteLine("08: SelectionSort");
 Console.WriteLine("09: Factorial");
 Console.WriteLine("10: LinkList");
+Console.WriteLine("11: PrimeNumber");
+Console.WriteLine("12: Fibonnaci");
 
 string choice = Console.ReadLine() ?? string.Empty;
 
@@ -46,6 +48,12 @@ switch (choice)
         break;
     case "10":
         TestLinkedList.Run();
+        break;
+    case "11":
+        PrimeNumber.Run();
+        break;
+    case "12":
+        Fibonnaci.Run();
         break;
     default:
         Console.WriteLine("Invalid input!");
