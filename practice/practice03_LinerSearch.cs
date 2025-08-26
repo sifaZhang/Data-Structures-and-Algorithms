@@ -24,7 +24,7 @@
         int target = int.Parse(strTarget);
 
             int index;
-            if (LinerSearch(numbers, target, out index))
+            if (LinerSearchFunction(numbers, target, out index))
             {
                 Console.WriteLine($"Number {target} found at index {index}.");
             }
@@ -49,7 +49,7 @@
             return array;
         }
 
-        public static bool LinerSearch(int[] array, int target, out int index)
+        public static bool LinerSearchFunction(int[] array, int target, out int index)
         {
             index = -1; // Default to -1 if not found
             for (int i = 0; i < array.Length; i++)

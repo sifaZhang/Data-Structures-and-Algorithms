@@ -16,16 +16,16 @@ namespace HelloWorld
             {
                 int number = 0;
                 bool success = Int32.TryParse(strData, out number);
-                if (success && number > 1)
+                if (success && number >= 0)
                 {
                     Console.WriteLine($"Fibonacci({number}) = {Fibonacci(number)}");
                 }
                 else
                 {
-                    Console.WriteLine("Please input a number which is more than 1.");
+                    Console.WriteLine("Please input a number which is more than 0.");
                 }
 
-                Console.WriteLine("Please input a maximum:");
+                Console.WriteLine("Please input a number:");
                 strData = Console.ReadLine() ?? string.Empty;
             }
         }
