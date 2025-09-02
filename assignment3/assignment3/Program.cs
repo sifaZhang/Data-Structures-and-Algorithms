@@ -109,7 +109,8 @@ namespace Assignment_3
                 Console.WriteLine("[2]: Dequeue");
                 Console.WriteLine("[3]: Peek");
                 Console.WriteLine("[4]: Clear");
-                Console.WriteLine("[5]: Testing");
+                Console.WriteLine("[5]: ShowQueue");
+                Console.WriteLine("[6]: Testing");
                 Console.WriteLine("[q]: Quit");
 
                 // Read user input and convert it to an integer.
@@ -122,9 +123,9 @@ namespace Assignment_3
                 }
                 else
                 {
-                    if (iChoice > 5 || iChoice < 1)
+                    if (iChoice > 6 || iChoice < 1)
                     {
-                        Console.WriteLine("Invalid input! Please input the number from 1 do 5!");
+                        Console.WriteLine("Invalid input! Please input the number from 1 do 6!");
                         continue;
                     }
                 }
@@ -145,6 +146,10 @@ namespace Assignment_3
                         TryClear();
                         break;
                     case 5:
+                        Console.WriteLine("The current queue is {0}", myQueue.ToString());
+                        Console.WriteLine("\r\n");
+                        break;
+                    case 6:
                         PerformanceTesting();
                         break;
                     default:
@@ -271,6 +276,7 @@ namespace Assignment_3
             keyValuePairs.Add(3, queuePeek);
             keyValuePairs.Add(4, queueClear);
 
+            myQueue.Clear();
             testMode = true;
         }
 
