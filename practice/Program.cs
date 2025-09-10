@@ -14,6 +14,7 @@ Console.WriteLine("09: Factorial");
 Console.WriteLine("10: LinkList");
 Console.WriteLine("11: PrimeNumber");
 Console.WriteLine("12: Fibonnaci");
+Console.WriteLine("14: BinaryTree");
 
 string choice = Console.ReadLine() ?? string.Empty;
 
@@ -54,6 +55,9 @@ switch (choice)
         break;
     case "12":
         Fibonnaci.Run();
+        break;
+    case "14":
+        BinaryTree.Run();
         break;
     default:
         Console.WriteLine("Invalid input!");
