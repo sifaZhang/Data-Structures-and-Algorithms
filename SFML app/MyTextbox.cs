@@ -29,30 +29,29 @@ namespace SFML_app
                 OutlineThickness = 2
             };
 
-            text = new Text("", font, 18)
+            text = new Text("", font, 28)
             {
                 FillColor = Color.Black,
                 Position = new Vector2f(position.X + 5, position.Y + 5)
             };
         }
 
-        public void HandleEvent(Event e)
+        public void HandleEvent(TextEventArgs e)
         {
             if (!isFocused) return;
 
-            if (e.Type == EventType.TextEntered)
+            string inputChar = e.Unicode;
+
+            if (inputChar == "\b" && input.Length > 0) // Backspace
             {
-                uint unicode = e.Text.Unicode;
-                if (unicode == 8 && input.Length > 0) // Backspace
-                {
-                    input.Remove(input.Length - 1, 1);
-                }
-                else if (unicode >= 32 && unicode < 128) // Printable ASCII
-                {
-                    input.Append((char)unicode);
-                }
-                text.DisplayedString = input.ToString();
+                input.Remove(input.Length - 1, 1);
             }
+            else if (inputChar.Length == 1 && inputChar[0] >= 32 && inputChar[0] < 128) // Printable ASCII
+            {
+                input.Append(inputChar);
+            }
+
+            text.DisplayedString = input.ToString();
         }
 
         public void CheckFocus(Vector2i mousePos)
@@ -70,6 +69,13 @@ namespace SFML_app
         public string GetText()
         {
             return input.ToString();
+        }
+
+        public void SetText(string newText)
+        {
+            input.Clear();
+            input.Append(newText);
+            text.DisplayedString = input.ToString();
         }
     }
 
