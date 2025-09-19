@@ -199,6 +199,8 @@ namespace Assignment_4
                         {
                             Console.WriteLine("PreOrder: " + sorted);
                         }
+
+                        binarySearchTree.DrawTree();
                     }
                 }
             }
@@ -227,6 +229,7 @@ namespace Assignment_4
                 }
                 else
                 {
+                    binarySearchTree.DrawTree();
                     Node? findNode = binarySearchTree.Search(iChoice);
                     if (findNode == null)
                     {
@@ -254,6 +257,7 @@ namespace Assignment_4
             }
             else
             {
+                binarySearchTree.DrawTree();
                 Console.WriteLine("InOrder: " + sorted);
             }
 
@@ -271,6 +275,7 @@ namespace Assignment_4
             }
             else
             {
+                binarySearchTree.DrawTree();
                 int smallest = binarySearchTree.Smallest();
                 int largest = binarySearchTree.Largest();
 
@@ -291,7 +296,7 @@ namespace Assignment_4
 
             //construct the stimulate data
             Random random = new Random();
-            int number = random.Next(10, 15);
+            int number = random.Next(5, 10);
             MyQueue queueAdd = new MyQueue();
             queueAdd.Enqueue(1);
             for (int i = 0; i < number; i++)

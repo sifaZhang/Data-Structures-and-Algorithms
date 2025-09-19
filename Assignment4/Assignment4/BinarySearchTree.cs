@@ -5,8 +5,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Assignment4
 {
@@ -19,6 +21,19 @@ namespace Assignment4
         {
             Value = item;
             Left = Right = null;
+        }
+    }
+    class PrintNode
+    {
+        public int level;
+        public bool occupied;
+        public Node? data;
+
+        public PrintNode()
+        {
+            level = -1;
+            occupied = false;
+            data = null;
         }
     }
 
@@ -214,6 +229,163 @@ namespace Assignment4
             int rightHeight = HeightRec(root.Right);
 
             return Math.Max(leftHeight, rightHeight) + 1;
+        }
+
+        private void PrintData(List<PrintNode> listPrintNode)
+        {
+            string printnodeStr = "";
+            for (int i = 0; i < listPrintNode.Count; i++)
+            {
+                if (listPrintNode[i].occupied)
+                {
+                    printnodeStr += "(yes," + (listPrintNode[i].data == null ? "*" : listPrintNode[i].data.Value.ToString()) + "," + listPrintNode[i].level.ToString() + ")";
+                }
+                else
+                {
+                    printnodeStr += "(no,#," + listPrintNode[i].level.ToString() + ")";
+                }
+
+                printnodeStr += " ";
+            }
+            Console.WriteLine(printnodeStr);
+        }
+
+        public void DrawTree()
+        {
+            List<List<Node?>> treeData =  new List<List<Node?>>();
+            List<Node?> currentNodes = new List<Node?>();
+            currentNodes.Add(Root);
+            treeData.Add(currentNodes);
+
+            //find all nodes in each level
+            int heigth = Height();
+            int curentHeight = 0;
+            while (curentHeight < heigth)
+            {
+                List<Node?> tempNodes = new List<Node?>();
+                for (int i = 0; i < currentNodes.Count; i++)
+                {
+                    Node? node = currentNodes[i];
+                    if (node == null)
+                    {
+                        tempNodes.Add(null);
+                        tempNodes.Add(null);
+                    }
+                    else
+                    {
+                        tempNodes.Add(node.Left == null ? null : node.Left);
+                        tempNodes.Add(node.Right == null ? null : node.Right);
+                    }
+                }
+
+                treeData.Add(tempNodes);
+                currentNodes = tempNodes;
+                curentHeight++;
+            }
+
+            //fill the print node list
+            if (treeData.Count > 0)
+            {
+                //fill the last level first
+                List<PrintNode> listPrintNode = new List<PrintNode>();
+                List<Node?> lastNodes = treeData[treeData.Count - 1];
+                for (int j = 0; j < lastNodes.Count; j++)
+                {
+                    PrintNode printNode = new PrintNode();
+                    printNode.level = treeData.Count - 1;
+                    Node? node = lastNodes[j];
+                    if (node != null)
+                    {
+                        printNode.data = node;
+                    }
+
+                    printNode.occupied = true;
+                    listPrintNode.Add(printNode);
+
+                    if (j != lastNodes.Count - 1) listPrintNode.Add(new PrintNode());
+                }
+
+                //fill other levels
+                for (int j = treeData.Count - 2; j >= 0; j--)
+                {
+                    List<Node?> currentTreeNode = treeData[j];
+                    int findIndex = 0;
+                    int k = 0;
+                    for (int i = 0; i < currentTreeNode.Count; i++)
+                    {
+                        Node? currentNode = currentTreeNode[i];
+                        for (; k < listPrintNode.Count; k++)
+                        {
+                            PrintNode tempNode = listPrintNode[k];
+                            if (!tempNode.occupied)
+                            {
+                                findIndex++;
+                                if (findIndex % 2 == 1)
+                                {
+                                    tempNode.occupied = true;
+                                    tempNode.level = j;
+                                    tempNode.data = currentNode;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    //PrintData(listPrintNode);
+                }
+
+                //PrintData(listPrintNode);
+
+                //print the tree
+                for ( int k = 0; k <= heigth; k++)
+                {
+                    string line = "Height " + k.ToString() + ": ";
+                    string lineSpace = "          ";
+                    for (int i = 0; i < listPrintNode.Count; i++)
+                    {
+                        //construct current level data line
+                        if (listPrintNode[i].level == k)
+                        {
+                            if (listPrintNode[i].data == null)
+                            {
+                                line += "  ";
+                            }
+                            else
+                            {
+                                int data = listPrintNode[i].data.Value;
+                                line += data.ToString("D2");
+                            }
+                        }
+                        else
+                        {
+                            line += "  ";
+                        }
+
+                        //construnct next level line space
+                        if (i + 1 < listPrintNode.Count 
+                            && listPrintNode[i + 1].level == k
+                            && listPrintNode[i + 1].data != null 
+                            && listPrintNode[i + 1].data.Left != null)
+                        {
+                            lineSpace += " /";
+                        }
+                        else if (i > 0 
+                            && listPrintNode[i - 1].level == k
+                            && listPrintNode[i - 1].data != null
+                            && listPrintNode[i - 1].data.Right != null)
+                        {
+                            lineSpace += "\\ ";
+                        }
+                        else
+                        {
+                            lineSpace += "  ";
+                        }
+                    }
+                        
+                    Console.WriteLine(line);
+                    if(k != heigth) Console.WriteLine(lineSpace);   //no need to print space line for the last level
+                }
+            }
         }
     }
 }
