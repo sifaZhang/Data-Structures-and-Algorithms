@@ -1,4 +1,9 @@
-﻿using SFML.Graphics;
+﻿//Author: Sifa Zhang
+//Studeng ID: 1606796
+//Date: 2025/09/22
+//This class implements a custom button with hover and click effects using SFML.
+
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using System;
@@ -15,13 +20,25 @@ namespace SFML_app
     {
         private RectangleShape shape;
         private Text label;
-        private Color normalColor = new Color(0, 120, 215);       // 蓝色
-        private Color hoverColor = new Color(70, 130, 180);        // SteelBlue
-        private Color pressedColor = new Color(30, 144, 255);      // DodgerBlue
-        private bool isPressed = false;
+        private Color normalColor;
+        private Color hoverColor;
+        private Color pressedColor;
+        private bool isPressed;
 
+        /// <summary>
+        /// constructor to initialize the button
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="size"></param>
+        /// <param name="text"></param>
+        /// <param name="font"></param>
         public MyButton(Vector2f position, Vector2f size, string text, Font font)
         {
+            isPressed = false;
+            normalColor = new Color(0, 120, 215);       // blue
+            hoverColor = new Color(70, 130, 180);        // SteelBlue
+            pressedColor = new Color(30, 144, 255);      // DodgerBlue
+
             shape = new RectangleShape(size)
             {
                 Position = position,
@@ -33,18 +50,23 @@ namespace SFML_app
                 FillColor = Color.White,
             };
 
-            // 设置原点为文字的中心
+            // set the origin to the center of the text
             SFML.Graphics.FloatRect textBounds = label.GetLocalBounds();
             label.Origin = new Vector2f(textBounds.Left + textBounds.Width / 2f, textBounds.Top + textBounds.Height / 2f);
 
-            // 设置位置为按钮中心
+            // set position to the center of the button
             Vector2f buttonCenter = new Vector2f(
-            shape.Position.X + shape.Size.X / 2f,
-            shape.Position.Y + shape.Size.Y / 2f);
+                shape.Position.X + shape.Size.X / 2f,
+                shape.Position.Y + shape.Size.Y / 2f);
 
             label.Position = buttonCenter;
         }
 
+        /// <summary>
+        /// update button state based on mouse position and click status
+        /// </summary>
+        /// <param name="mousePos"></param>
+        /// <param name="mouseHeld"></param>
         public void Update(Vector2i mousePos, bool mouseHeld)
         {
             FloatRect bounds = shape.GetGlobalBounds();
@@ -60,26 +82,36 @@ namespace SFML_app
             }
         }
 
+        /// <summary>
+        /// detect if the button is clicked
+        /// </summary>
+        /// <param name="mousePos"></param>
+        /// <param name="mouseReleased"></param>
+        /// <returns></returns>
         public bool IsClicked(Vector2i mousePos, bool mouseReleased)
         {
             return shape.GetGlobalBounds().Contains(mousePos.X, mousePos.Y) && mouseReleased;
         }
 
+        /// <summary>
+        /// draw the button with rounded corners
+        /// </summary>
+        /// <param name="window"></param>
         public void Draw(RenderWindow window)
         {
             float radius = 10f;
 
-            // 主矩形尺寸
+            // the main rectangle parameters
             Vector2f size = shape.Size;
             Vector2f position = shape.Position;
             Color fill = shape.FillColor;
 
-            // 中间矩形（去掉圆角区域）
+            // the center rectangle
             RectangleShape center = new RectangleShape(new Vector2f(size.X - 2 * radius, size.Y - 2 * radius));
             center.Position = new Vector2f(position.X + radius, position.Y + radius);
             center.FillColor = fill;
 
-            // 四条边
+            // four edge rectangles
             RectangleShape top = new RectangleShape(new Vector2f(size.X - 2 * radius, radius));
             top.Position = new Vector2f(position.X + radius, position.Y);
             top.FillColor = fill;
@@ -96,7 +128,7 @@ namespace SFML_app
             right.Position = new Vector2f(position.X + size.X - radius, position.Y + radius);
             right.FillColor = fill;
 
-            // 四个圆角（四分之一圆）
+            // four corner circles
             CircleShape corner = new CircleShape(radius, 30);
             corner.Origin = new Vector2f(radius, radius);
             corner.FillColor = fill;
@@ -117,7 +149,7 @@ namespace SFML_app
             bottomRight.Position = new Vector2f(position.X + size.X - radius, position.Y + size.Y - radius);
             bottomRight.Rotation = 0;
 
-            // 绘制所有部分
+            // draw all parts
             window.Draw(center);
             window.Draw(top);
             window.Draw(bottom);
@@ -128,7 +160,6 @@ namespace SFML_app
             window.Draw(bottomLeft);
             window.Draw(bottomRight);
             window.Draw(label);
-
         }
     }
 }

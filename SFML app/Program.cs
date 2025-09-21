@@ -1,4 +1,9 @@
-﻿using SFML.Graphics;
+﻿//Author: Sifa Zhang
+//Studeng ID: 1606796
+//Date: 2025/09/22
+//This program creates a window using SFML.NET and visualizes a queue data structure with interactive buttons and text input.
+
+using SFML.Graphics;
 using SFML.System;
 using SFML.Window;
 using SFML_app;
@@ -7,8 +12,11 @@ using System.Text.RegularExpressions;
 using static SFML.Window.Mouse;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace RotatingHelloWorldSfmlDotNetCoreCSharp
+namespace SFML_app
 {
+    /// <summary>
+    /// this is the main program class
+    /// </summary>
     class Program
     {
         static void Main(string[] args)
@@ -20,6 +28,13 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
         }
     }
 
+    /// <summary>
+    /// Represents a graphical window for visualizing and interacting with a queue data structure.
+    /// </summary>
+    /// <remarks>This class provides a graphical interface for managing a queue, including operations such as
+    /// enqueue, dequeue, fetch, and clear. It uses the SFML.NET library for rendering and handling user input. The
+    /// window includes buttons, text input, and visual feedback for queue operations. The queue visualization is
+    /// updated in real-time based on user interactions.</remarks>
     class MyWindow
     {
         private RenderWindow renderWindow;
@@ -33,42 +48,47 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
         private QueueVisualizer queue;
         private bool mouseHeld;
         private bool mouseReleased;
-        private Color defaultColor = new Color(200, 230, 255);
+        private Color defaultColor;
         private ConvexShape arrow;
         private Text headLabel;
-        private bool roate = true;
+        private bool roate;
         private Clock clock;
         private float delta, angle, angleSpeed;
 
+        /// <summary>
+        /// constructor
+        /// </summary>  
         public MyWindow()
         {
-            VideoMode mode = new VideoMode(1980, 900);
-            renderWindow = new RenderWindow(mode, "SFML.NET");
-
-            renderWindow.Closed += Window_Closed;
-            renderWindow.KeyPressed += Window_KeyPressed;
-            renderWindow.KeyReleased += Window_KeyReleased;
-
+            // Load a font
             font = new Font("C:/Windows/Fonts/arial.ttf");
 
+            //set the position of TextBox and Label
             txtInput = new MyTextBox(new Vector2f(50, 100), new Vector2f(200, 50), font);
             errInput = new MyLabel(new Vector2f(300, 100), new Vector2f(400, 50), font);
-
+            
+            // set the position of Buttons
             btnEnqueue = new MyButton(new Vector2f(50, 700), new Vector2f(200, 100), "Enquene", font);
             btnDequeue = new MyButton(new Vector2f(300, 700), new Vector2f(200, 100), "Dequene", font);
             btnFetch = new MyButton(new Vector2f(550, 700), new Vector2f(200, 100), "Fetch", font);
             btnClear = new MyButton(new Vector2f(800, 700), new Vector2f(200, 100), "Clear", font);
 
+            // Initialize the queue visualizer
             queue = new QueueVisualizer(font, new Vector2f(50, 260));
+            defaultColor = new Color(200, 230, 255);
             queue.SetColor(defaultColor);
 
+            // Initialize head arrow
             arrow = new ConvexShape(3);
+            arrow.FillColor = Color.Red;
+            roate = true;
             headLabel = new Text("Head", font, 28)
             {
                 FillColor = Color.Red,
                 Position = new Vector2f(-1, -1)
             };
 
+            // Initialize clock for rotation
             clock = new Clock();
             delta = 0;
             angle = 0;
@@ -76,6 +96,15 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
 
             mouseHeld = false;
             mouseReleased = false;
+
+            // Create the main window
+            VideoMode mode = new VideoMode(1980, 900);
+            renderWindow = new RenderWindow(mode, "My Queue");
+
+            // Attach event handlers
+            renderWindow.Closed += Window_Closed;
+            renderWindow.KeyPressed += Window_KeyPressed;
+            renderWindow.KeyReleased += Window_KeyReleased;
 
             renderWindow.Closed += (obj, e) => { renderWindow.Close(); };
             renderWindow.MouseButtonPressed += (_, e) => {
@@ -94,6 +123,11 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             };
         }
 
+        /// <summary>
+        /// Starts the main application loop, which continues running while the render window remains open.
+        /// </summary>
+        /// <remarks>This method repeatedly calls the <c>Update</c> and <c>Draw</c> methods in a loop to
+        /// handle application logic and rendering. The loop will terminate when the render window is closed.</remarks>
         public void Run()
         {
             while (this.renderWindow.IsOpen)
@@ -103,6 +137,9 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// updates the state of the clear button and handles its click event.
+        /// </summary>
         private void UpdateClearButton()
         {
             Vector2i mousePos = Mouse.GetPosition(renderWindow);
@@ -115,6 +152,9 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// updates the state of the fetch button and handles its click event.
+        /// </summary>
         private void UpdateFetchButton()
         {
             Vector2i mousePos = Mouse.GetPosition(renderWindow);
@@ -133,6 +173,9 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// updates the state of the enqueue button and handles its click event.
+        /// </summary>
         private void UpdateEnqueueButton()
         {
             Vector2i mousePos = Mouse.GetPosition(renderWindow);
@@ -152,6 +195,9 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// updates the state of the dequeue button and handles its click event.
+        /// </summary>
         private void UpdateDequeueButton()
         {
             Vector2i mousePos = Mouse.GetPosition(renderWindow);
@@ -164,16 +210,18 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
                 }
                 else
                 {
-                    int? value = queue.Fetch();
-                    if (value.HasValue)
+                    int value;
+                    if (queue.Dequeue(out value))
                     {
-                        errInput.SetText("Node(" + value.Value.ToString() + ") has been popped.");
+                        errInput.SetText("Node(" + value.ToString() + ") has been popped.");
                     }
-                    queue.Dequeue();
                 }
             }
         }
 
+        /// <summary>
+        /// updates the state of the window, including handling events and updating button states.
+        /// </summary>
         public void Upate()
         {
             renderWindow.DispatchEvents();
@@ -188,6 +236,9 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             renderWindow.Clear(new Color(0, 50, 50));
         }
 
+        /// <summary>
+        /// updates and draws the arrow pointing to the head of the queue, including its rotation if enabled.
+        /// </summary>
         private void DrawArrow()
         {
             if (queue.Empty()) return;
@@ -195,29 +246,32 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             Vector2f headPos = queue.GetHeadPos();
             //Console.WriteLine(headPos);
 
-            ConvexShape arrow = new ConvexShape(3);
             arrow.SetPoint(0, new Vector2f(headPos.X - 20, headPos.Y + 170));
             arrow.SetPoint(1, new Vector2f(headPos.X + 20, headPos.Y + 170));
             arrow.SetPoint(2, new Vector2f(headPos.X, headPos.Y + 140));
-            arrow.FillColor = Color.Red;
             renderWindow.Draw(arrow);
 
             headLabel.Position = new Vector2f(headPos.X, headPos.Y + 230);
 
-            if(roate)
+            // handle rotation
+            if (roate)
             {
-                // 设置旋转中心为文本中心
+                // set origin to center for proper rotation
                 var bounds = headLabel.GetLocalBounds();
                 headLabel.Origin = new SFML.System.Vector2f(bounds.Left + bounds.Width / 2f, bounds.Top + bounds.Height / 2f);
 
-                // 设置位置和旋转
-                float delta = clock.Restart().AsSeconds();
+                // set position to be above the head
+                delta = clock.Restart().AsSeconds();
                 angle += angleSpeed * delta;
                 headLabel.Rotation = angle;
             }
 
             renderWindow.Draw(headLabel);
         }
+
+        /// <summary>
+        /// draws the current state of the window, including buttons, text input, error messages, and the queue visualization.
+        /// </summary>
         public void Draw()
         {
             btnClear.Draw(renderWindow);
@@ -235,6 +289,11 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             renderWindow.Display();
         }
 
+        /// <summary>
+        /// handles key press events for the window, including closing the window on ESC key and toggling rotation on SPACE key.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_KeyPressed(object? sender, KeyEventArgs e)
         {
             Window? window = (Window?)sender;
@@ -253,6 +312,11 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// handles key release events for the window, specifically re-enabling rotation and resetting the queue color when the SPACE key is released.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_KeyReleased(object? sender, KeyEventArgs e)
         {
             Window? window = (Window?)sender;
@@ -263,6 +327,11 @@ namespace RotatingHelloWorldSfmlDotNetCoreCSharp
             }
         }
 
+        /// <summary>
+        /// handles the window closed event by closing the window.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Window_Closed(object? sender, EventArgs e)
         {
             Window? window = (Window?)sender;

@@ -1,4 +1,9 @@
-﻿using SFML.Graphics;
+﻿//Author: Sifa Zhang
+//Studeng ID: 1606796
+//Date: 2025/09/22
+//This class visualizes a queue data structure using SFML.
+
+using SFML.Graphics;
 using SFML.System;
 using System;
 using System.Collections.Generic;
@@ -10,7 +15,7 @@ namespace SFML_app
 {
     internal class QueueVisualizer
     {
-        private Queue<int> queue;
+        private LinkedList myList;
         private Font font;
         private Vector2f startPosition;
         private float radius;
@@ -18,9 +23,14 @@ namespace SFML_app
         private SFML.Graphics.Color fillColor;
         private Vector2f headPos;
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="font"></param>
+        /// <param name="startPosition"></param>
         public QueueVisualizer(Font font, Vector2f startPosition)
         {
-            queue = new Queue<int>();
+            myList = new LinkedList();
             this.font = font;
             this.startPosition = startPosition;
             fillColor = new SFML.Graphics.Color(200, 230, 255);
@@ -29,50 +39,85 @@ namespace SFML_app
             headPos = new Vector2f();
         }
 
+        /// <summary>
+        /// Clears the queue.
+        /// </summary>
         public void Clear()
         {
-            queue.Clear();
+            myList.Clear();
         }
 
+        /// <summary>
+        /// fetches the front element of the queue without removing it.
+        /// </summary>
+        /// <returns></returns>
         public int? Fetch()
         {
-            return queue.Count > 0 ? queue.Peek() : (int?)null;
+            int value;
+            return myList.GetHeadNode(out value) ? value : (int?)null;
         }
 
+        /// <summary>
+        /// enqueues a new value to the back of the queue.
+        /// </summary>
+        /// <param name="value"></param>
         public void Enqueue(int value)
         {
-            queue.Enqueue(value);
+            myList.AddNode(value);
         }
 
+        /// <summary>
+        /// Determines whether the queue is empty.
+        /// </summary>
+        /// <returns><see langword="true"/> if the queue contains no elements; otherwise, <see langword="false"/>.</returns>
         public bool Empty()
         {
-            return queue.Count == 0;
-        }
-        
-        public void Dequeue()
-        {
-            if (queue.Count > 0)
-                queue.Dequeue();
+            return myList.Size() == 0;
         }
 
+        /// <summary>
+        /// dequeues the front element of the queue.
+        /// </summary>
+        public bool Dequeue(out int vaule)
+        {
+            return myList.RemoveFirstNode(out vaule);
+        }
+
+        /// <summary>
+        /// Sets the fill color of the object.
+        /// </summary>
+        /// <param name="color">The new fill color to apply.</param>
         public void SetColor(SFML.Graphics.Color color)
         {
             fillColor = color;
         }
 
+        /// <summary>
+        /// Gets the current position of the head in 2D space.
+        /// </summary>
+        /// <returns>A <see cref="Vector2f"/> representing the coordinates of the head position.</returns>
         public Vector2f GetHeadPos()
         {
             return headPos;
         }
 
+        /// <summary>
+        /// draws the queue onto the provided render window.
+        /// </summary>
+        /// <param name="window"></param>
         public void Draw(RenderWindow window)
         {
-            headPos.X = -1; // Reset head position
-            
+            // Reset head position
+            headPos.X = -1; 
+
+            // Starting position for drawing
             float x = startPosition.X;
             float y = startPosition.Y;
 
-            List<int> tempList = queue.ToList();
+            // Convert queue to list for indexed access
+            List<int> tempList = myList.ToList();
+
+            // Draw from back to front to maintain queue order
             for (int i = tempList.Count - 1; i >= 0; i--)
             {
                 int value = tempList[i];
@@ -80,8 +125,6 @@ namespace SFML_app
                 CircleShape circle = new CircleShape(radius)
                 {
                     FillColor = fillColor,
-                    //OutlineColor = Color.Black,
-                    //OutlineThickness = 2,
                     Position = new Vector2f(x, y)
                 };
 
@@ -90,24 +133,26 @@ namespace SFML_app
                     FillColor = SFML.Graphics.Color.Black,
                 };
 
-                // 获取文字边界
+                // get text bounds for centering
                 FloatRect textBounds = label.GetLocalBounds();
 
-                // 设置原点为文字中心
+                // set origin to center of text
                 label.Origin = new Vector2f(textBounds.Left + textBounds.Width / 2, textBounds.Top + textBounds.Height / 2);
 
-                // 设置位置为圆形中心
+                // set position to center of circle
                 label.Position = new Vector2f(x + radius, y + radius);
 
                 window.Draw(circle);
                 window.Draw(label);
 
+                // Store head position
                 if (i == 0) // Head
                 {
                     headPos.X = circle.Position.X + radius;
                     headPos.Y = circle.Position.Y + radius;
                 }
 
+                // Move x for next circle
                 x += spacing;
             }
         }
