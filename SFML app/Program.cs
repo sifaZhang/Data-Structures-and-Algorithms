@@ -8,6 +8,7 @@ using SFML.System;
 using SFML.Window;
 using SFML_app;
 using System;
+using System.Drawing;
 using System.Text.RegularExpressions;
 using static SFML.Window.Mouse;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -48,12 +49,14 @@ namespace SFML_app
         private QueueVisualizer queue;
         private bool mouseHeld;
         private bool mouseReleased;
-        private Color defaultColor;
+        private SFML.Graphics.Color defaultColor;
         private ConvexShape arrow;
         private Text headLabel;
         private bool roate;
         private Clock clock;
         private float delta, angle, angleSpeed;
+        private Rectangle rectQueue;
+        private bool mouseClickQueueArea;
 
         /// <summary>
         /// constructor
@@ -65,7 +68,7 @@ namespace SFML_app
 
             //set the position of TextBox and Label
             txtInput = new MyTextBox(new Vector2f(50, 100), new Vector2f(200, 50), font);
-            errInput = new MyLabel(new Vector2f(300, 100), new Vector2f(400, 50), font);
+            errInput = new MyLabel(new Vector2f(300, 100), new Vector2f(700, 50), font);
             
             // set the position of Buttons
             btnEnqueue = new MyButton(new Vector2f(50, 700), new Vector2f(200, 100), "Enquene", font);
@@ -74,17 +77,19 @@ namespace SFML_app
             btnClear = new MyButton(new Vector2f(800, 700), new Vector2f(200, 100), "Clear", font);
 
             // Initialize the queue visualizer
+            mouseClickQueueArea = false; 
+            rectQueue = new Rectangle(0, 260, 1900, 440);
             queue = new QueueVisualizer(font, new Vector2f(50, 260));
-            defaultColor = new Color(200, 230, 255);
+            defaultColor = new SFML.Graphics.Color(200, 230, 255);
             queue.SetColor(defaultColor);
 
             // Initialize head arrow
             arrow = new ConvexShape(3);
-            arrow.FillColor = Color.Red;
-            roate = true;
+            arrow.FillColor = SFML.Graphics.Color.Red;
+            roate = false;
             headLabel = new Text("Head", font, 28)
             {
-                FillColor = Color.Red,
+                FillColor = SFML.Graphics.Color.Red,
                 Position = new Vector2f(-1, -1)
             };
 
@@ -98,8 +103,9 @@ namespace SFML_app
             mouseReleased = false;
 
             // Create the main window
-            VideoMode mode = new VideoMode(1980, 900);
+            VideoMode mode = new VideoMode(1900, 900);
             renderWindow = new RenderWindow(mode, "My Queue");
+            renderWindow.Position = new Vector2i(10, 54);
 
             // Attach event handlers
             renderWindow.Closed += Window_Closed;
@@ -111,10 +117,36 @@ namespace SFML_app
                 if (e.Button == Mouse.Button.Left) mouseHeld = true;
                 Vector2i mousePos = Mouse.GetPosition(renderWindow);
                 txtInput.CheckFocus(mousePos);
+
+                // Check if the mouse is in the queue area
+                if (rectQueue.Contains(mousePos.X, mousePos.Y))
+                {
+                    mouseClickQueueArea = true;
+                }
+                else
+                {
+                    mouseClickQueueArea = false;
+                }
             };
 
             renderWindow.MouseButtonReleased += (_, e) => {
-                if (e.Button == Mouse.Button.Left) { mouseHeld = false; mouseReleased = true; }
+                if (e.Button == Mouse.Button.Left) { 
+                    mouseHeld = false; 
+                    mouseReleased = true; 
+                }
+
+                // Handle clicks in the queue area
+                if (mouseClickQueueArea)
+                {
+                    if (e.Button == Mouse.Button.Left)
+                    {
+                        EnqueueData();
+                    }
+                    else if (e.Button == Mouse.Button.Right)
+                    {
+                        DequeueData();
+                    }
+                }
             };
 
             renderWindow.TextEntered += (sender, e) =>
@@ -174,6 +206,67 @@ namespace SFML_app
         }
 
         /// <summary>
+        /// add a new value to the queue from the text input or a random value if input is empty.
+        /// </summary>
+        private void EnqueueData()
+        {
+            int value = 0;
+            if (txtInput.GetText() == "")
+            {
+                Random rnd = new Random();
+                value = rnd.Next(0, 100);
+            }
+            else
+            {
+                if (!int.TryParse(txtInput.GetText(), out int valueTemp))
+                {
+                    errInput.SetText("Invalide input!");
+                    txtInput.SetText("");
+                    return;
+                }
+
+                value = valueTemp;
+                if (value > 99 || value < 0)
+                {
+                    errInput.SetText("Please input a nunber between 0 and 99.");
+                    txtInput.SetText("");
+                    return;
+                }
+            }
+           
+            if (queue.Size() > 7)
+            {
+                errInput.SetText("The queue has reach to the maximum to show!");
+                txtInput.SetText("");
+            }
+            else
+            {
+                queue.Enqueue(value);
+                txtInput.SetText("");
+                errInput.SetText("");
+            }
+        }
+
+        /// <summary>
+        /// removes the front value from the queue and displays it in the error label.
+        /// </summary>
+        private void DequeueData()
+        {
+            if (queue.Empty())
+            {
+                errInput.SetText("Queue is empty.");
+            }
+            else
+            {
+                int value;
+                if (queue.Dequeue(out value))
+                {
+                    errInput.SetText("Node(" + value.ToString() + ") has been popped.");
+                }
+            }
+        }
+
+        /// <summary>
         /// updates the state of the enqueue button and handles its click event.
         /// </summary>
         private void UpdateEnqueueButton()
@@ -182,16 +275,7 @@ namespace SFML_app
             btnEnqueue.Update(mousePos, mouseHeld);
             if (btnEnqueue.IsClicked(mousePos, mouseReleased))
             {
-                if (int.TryParse(txtInput.GetText(), out int value))
-                {
-                    queue.Enqueue(value);
-                    txtInput.SetText("");
-                    errInput.SetText("");
-                }
-                else
-                {
-                    errInput.SetText("Invalid input.");
-                }
+                EnqueueData();
             }
         }
 
@@ -204,18 +288,7 @@ namespace SFML_app
             btnDequeue.Update(mousePos, mouseHeld);
             if (btnDequeue.IsClicked(mousePos, mouseReleased))
             {
-                if (queue.Empty())
-                {
-                    errInput.SetText("Queue is empty.");
-                }
-                else
-                {
-                    int value;
-                    if (queue.Dequeue(out value))
-                    {
-                        errInput.SetText("Node(" + value.ToString() + ") has been popped.");
-                    }
-                }
+                DequeueData();
             }
         }
 
@@ -233,7 +306,18 @@ namespace SFML_app
 
             mouseReleased = false;
 
-            renderWindow.Clear(new Color(0, 50, 50));
+            renderWindow.Clear(new SFML.Graphics.Color(0, 50, 50));
+        }
+
+        private void DrawTip()
+        {
+            string tip = "Please run the game on (1920*1080)";
+            Text tipText = new Text(tip, font, 20)
+            {
+                FillColor = SFML.Graphics.Color.White,
+                Position = new Vector2f(1550, 860)
+            };
+            renderWindow.Draw(tipText);
         }
 
         /// <summary>
@@ -251,7 +335,7 @@ namespace SFML_app
             arrow.SetPoint(2, new Vector2f(headPos.X, headPos.Y + 140));
             renderWindow.Draw(arrow);
 
-            headLabel.Position = new Vector2f(headPos.X, headPos.Y + 230);
+            headLabel.Position = new Vector2f(headPos.X - 30, headPos.Y + 200);
 
             // handle rotation
             if (roate)
@@ -285,6 +369,7 @@ namespace SFML_app
             queue.Draw(renderWindow);
 
             DrawArrow();
+            DrawTip();
 
             renderWindow.Display();
         }
@@ -307,7 +392,7 @@ namespace SFML_app
                 if (e.Code == Keyboard.Key.Space)
                 {
                     roate = false;
-                    queue.SetColor(Color.Yellow);
+                    queue.SetColor(SFML.Graphics.Color.Yellow);
                 }
             }
         }
@@ -322,7 +407,7 @@ namespace SFML_app
             Window? window = (Window?)sender;
             if (e.Code == Keyboard.Key.Space)
             {
-                roate = true;
+                //roate = true;
                 queue.SetColor(defaultColor);
             }
         }

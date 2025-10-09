@@ -35,7 +35,7 @@ namespace SFML_app
             this.startPosition = startPosition;
             fillColor = new SFML.Graphics.Color(200, 230, 255);
             radius = 100f;
-            spacing = 250f;
+            spacing = 230f;
             headPos = new Vector2f();
         }
 
@@ -73,6 +73,15 @@ namespace SFML_app
         public bool Empty()
         {
             return myList.Size() == 0;
+        }
+
+        /// <summary>
+        /// get the size of the queue
+        /// </summary>
+        /// <returns></returns>
+        public int Size()
+        {
+            return myList.Size();
         }
 
         /// <summary>
